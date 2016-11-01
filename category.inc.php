@@ -4,7 +4,7 @@
 		exit('Access Denied');
 	}
 
-	$_G['uid'] || exit('Go die...');
+	$_G['uid'] || exit();
 
 	require libfile('function/upload');
 	$upcfg = getuploadconfig($_G['uid'], 0, false);

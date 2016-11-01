@@ -44,11 +44,28 @@ class discuz_upload{
 				$attach['name'] = cutstr($attach['name'], 80, '').'.'.$attach['ext'];
 			}
 
+			$attach['maile'] = $attach['sha1'] . '.' . $attach['ext'];
 			$attach['isimage'] = $this->is_image_ext($attach['ext']);
 			$attach['extension'] = $this->get_target_extension($attach['ext']);
 
-			$attach['attachment'] = $attach['sha1'].'.'.$attach['ext'];
-			$attach['target'] = getglobal('setting/attachdir').'./'.$this->type.'/'.$attach['attachment'];
+			if($attach['isimage']){
+				global $_G;
+				if($_G['cache']['plugin']['qiniu']['protect']){
+					if($attach['imageInfo']['width'] > 300)
+						$attach['attachment'] = $attach['maile'].'-'.$_G['cache']['plugin']['qiniu']['default'];
+					else
+						$attach['attachment'] = $attach['maile'].'-'.$_G['cache']['plugin']['qiniu']['thumbnail'];
+				}else{
+					if($attach['imageInfo']['width'] > 300)
+						$attach['attachment'] = $attach['maile'].($_G['cache']['plugin']['qiniu']['default'] ? ('-'.$_G['cache']['plugin']['qiniu']['default']) : '');
+					else
+						$attach['attachment'] = $attach['maile'].($_G['cache']['plugin']['qiniu']['thumbnail'] ? ('-'.$_G['cache']['plugin']['qiniu']['thumbnail']) : '');
+				}
+			}else{
+				$attach['attachment'] = $attach['maile'];
+			}
+
+			$attach['target'] = getglobal('setting/attachdir').'./'.$this->type.'/'.$attach['maile'];
 
 			$this->attach = & $attach;
 			$this->errorcode = 0;
@@ -59,7 +76,7 @@ class discuz_upload{
 
 	function save($ignore = 0) {
 		if($ignore) {
-			if(!$this->save_to_local($this->attach['tmp_name'], $this->attach['attachment'])) {
+			if(!$this->save_to_local($this->attach['tmp_name'], $this->attach['maile'])) {
 				$this->errorcode = -103;
 				return false;
 			} else {
@@ -74,7 +91,7 @@ class discuz_upload{
 			$this->errorcode = -102;
 		} elseif(in_array($this->type, array('common')) && (!$this->attach['isimage'] && $this->attach['ext'] != 'ext')) {
 			$this->errorcode = -102;
-		} elseif(!$this->save_to_local($this->attach['tmp_name'], $this->attach['attachment'])) {
+		} elseif(!$this->save_to_local($this->attach['tmp_name'], $this->attach['maile'])) {
 			$this->errorcode = -103;
 		} elseif(($this->attach['isimage'] || $this->attach['ext'] == 'swf') && (!$this->attach['imageInfo'] = $this->get_image_info($this->attach['target']))) {
 			$this->errorcode = -104;

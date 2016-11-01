@@ -2,9 +2,9 @@
 
 <div class="upfile">
 	<h3 class="flb">
-		<em id="return_upload">上传</em>
+		<em id="return_upload">{lang qiniu:upload}</em>
 		<em id="uploadwindowing" class="mtn" style="visibility:hidden"><img src="{IMGDIR}/uploading.gif" alt="" /></em>
-		<span><a href="javascript:;" class="flbc" onclick="hideWindow('upload', 0)" title="关闭">关闭</a></span>
+		<span><a href="javascript:;" class="flbc" onclick="hideWindow('upload', 0)" title="{lang qiniu:close}">{lang qiniu:close}</a></span>
 	</h3>
 	<div class="c">
 		<form id="uploadform" class="uploadform ptm pbm" method="post" autocomplete="off" target="uploadattachframe" action="http://upload.qiniu.com/" enctype="multipart/form-data" onsubmit="return false">
@@ -14,11 +14,11 @@
 			<input type="hidden" name="token" value="undefined">
 			<div class="filebtn">
 				<input type="file" name="file" id="filedata" class="pf cur1" size="1" onchange="uploadWindowstart($('uploadform'));" />
-				<button type="button" class="pn pnc"><strong>浏览</strong></button>
+				<button type="button" class="pn pnc"><strong>{lang qiniu:browse}</strong></button>
 			</div>
 		</form>
 		<p class="xg1 mtn">
-			可用扩展名: <span class="xi1">{$upcfg[imageexts][ext]}</span>
+			{lang qiniu:allowExt}: <span class="xi1">{$upcfg[imageexts][ext]}</span>
 		</p>
 		<iframe name="uploadattachframe" id="uploadattachframe" style="display: none;" onload="uploadWindowload(this);"></iframe>
 	</div>

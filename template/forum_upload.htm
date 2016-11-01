@@ -76,8 +76,8 @@ function maile_upload(uptype){
 	this.init = function(bbda){
 		var fmid = maile_upload.rand();
 		var upid = maile_upload.rand();
-		var str = "<form id='" + fmid + "' enctype='multipart/form-data' action='http://upload.qiniu.com/' method='POST'>";
-		str += "<input  id='" + upid + "' name='file' type='file' value='上传图片' />";
+		var str = "<form id='" + fmid + "' enctype='multipart/form-data' action='http://upload.qiniu.com/' method='POST' accept-charset='utf-8'>";
+		str += "<input  id='" + upid + "' name='file' type='file' value='{lang qiniu:uploadImg}' />";
 		str += "</form>";
 		(this.bbda = bbda).innerHTML = str;
 		this.bind(document.getElementById(upid), document.getElementById(fmid));
@@ -135,14 +135,14 @@ function maile_upload(uptype){
 				return;
 
 			if(this.files[0].size > ("$swfconfig[max]"*1024)){
-				showError("上传的文件大小不能超过 $swfconfig[max] 字节");
+				showError("{lang qiniu:notExceed} $swfconfig[max] {lang qiniu:byte}");
 				return;
 			}
 
 			var ext = maile_upload.getExt(this.files[0].name).toLowerCase();
 			var types = new Array("$swfconfig[imageexts][ext];", "$swfconfig[attachexts][ext];");
-			if(types[uptype]!="*.*" && types[uptype].indexOf("*"+ext+";")==-1){
-				showError("只允许上传 " + types[uptype] + " 类型的文件");
+			if(types[uptype]!="*.*;" && types[uptype].indexOf("*"+ext+";")==-1){
+				showError("{lang qiniu:onlyAllow} " + types[uptype] + " {lang qiniu:typeFile}");
 				return;
 			}
 
@@ -192,7 +192,7 @@ function maile_upload(uptype){
 						maile.files[ifmid].filestatus = -2;
 						maile.setStatus(1, maile.files[ifmid], maile.files[ifmid].size/2, maile.files[ifmid].size);
 					}else{
-						alert("请检查您的网络是否正常!");
+						alert("{lang qiniu:checkNetwork}");
 					}
 				}
 			}
@@ -211,7 +211,7 @@ function maile_upload(uptype){
 				maile.setStatus(2, maile.files[ifmid], data.id);
 				console.log(data, maile.files[ifmid]);
 			}else{
-				alert("上传失败! NRSK01");
+				alert("{lang qiniu:uploadError} NRSK01");
 			}
 		}
 
@@ -298,7 +298,7 @@ function uploadWindowstart(t){
 				t.elements["token"].value = xhr.responseText;
 				t.submit();
 			}else{
-				alert("请检查您的网络是否正常!");
+				alert("{lang qiniu:checkNetwork}");
 			}
 		}
 	}
@@ -307,12 +307,6 @@ function uploadWindowstart(t){
 
 }
 
-<!--{if $_G['cache']['plugin']['qiniu']['protect']}-->
-	<!--{eval $style = '-'.$_G['cache']['plugin']['qiniu']['thumbnail'];}-->
-<!--{else}-->
-	<!--{eval $style = '';}-->
-<!--{/if}-->
-
 // 上传完毕
 function uploadWindowload(t) {
 	$('uploadwindowing').style.visibility = 'hidden';
@@ -320,22 +314,16 @@ function uploadWindowload(t) {
 	if(str == '') return;
 	var arr = str.split('|');
 	if(arr[0] == 'DISCUZUPLOAD' && arr[2] == 0) {
-		// UPLOADWINRECALL(arr[3], arr[5], arr[6]);
-		var sid = UPLOADWINRECALL.toString().split("sortaid_")[1].split("_upload")[0];
-		$("sortaid_" + sid + "_url").value = arr[5];
-		$('sortaid_' + sid).value = arr[3];
-		$('sortattachurl_' + sid).value = '{$_G['setting']['attachurl']}forum/' + arr[5];
-		$('sortattach_image_' + sid).innerHTML = '<img src="' + '{$_G['setting']['attachurl']}forum/' + arr[5] + '{$style}" class="spimg" />';
-		ATTACHORIMAGE = 1;
+		UPLOADWINRECALL(arr[3], arr[5], arr[6]);
 		hideWindow('upload', 0);
 	} else {
 		var sizelimit = '';
 		if(arr[7] == 'ban') {
-			sizelimit = '(附件类型被禁止)';
+			sizelimit = '({lang qiniu:typeBlocked})';
 		} else if(arr[7] == 'perday') {
-			sizelimit = '(不能超过 ' + arr[8] + ' 字节)';
+			sizelimit = '({lang qiniu:notExceed} ' + arr[8] + ' {lang qiniu:byte})';
 		} else if(arr[7] > 0) {
-			sizelimit = '(不能超过 ' + arr[7] + ' 字节)';
+			sizelimit = '({lang qiniu:notExceed} ' + arr[7] + ' {lang qiniu:byte})';
 		}
 		showError(STATUSMSG[arr[2]] + sizelimit);
 	}

@@ -5,6 +5,19 @@
 
 	if(!function_exists('maile_unlink')){
 		function maile_unlink($attach){
+			global $_G;
+
+			if($attach['isimage']){
+				$default = $thumbnail = '';
+				if($_G['cache']['plugin']['qiniu']['default'])
+					$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+				if($_G['cache']['plugin']['qiniu']['thumbnail'])
+					$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
+				$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], '-')));
+				if($s==$default || $s==$thumbnail)
+					$attach['attachment'] = substr($attach['attachment'], 0, $i);
+			}
+
 			$attachXML = new maile\attachXML($attach['attachment'], DISCUZ_ROOT.'source/plugin/qiniu/attach/');
 			$attachXML->find();
 

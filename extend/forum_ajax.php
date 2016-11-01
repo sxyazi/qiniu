@@ -38,7 +38,17 @@ switch($_GET['action']){
 				if($attach && ($attach['pid'] && $attach['pid'] == $_GET['pid'] && $_G['uid'] == $attach['uid'] || $_G['forum']['ismoderator'] || !$attach['pid'] && $_G['uid'] == $attach['uid'])) {
 					C::t('forum_attachment_n')->delete('aid:'.$aid, $aid);
 					C::t('forum_attachment')->delete($aid);
-					dunlink($attach);
+
+					if($attach['isimage']){
+						$default = $thumbnail = '';
+						if($_G['cache']['plugin']['qiniu']['default'])
+							$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+						if($_G['cache']['plugin']['qiniu']['thumbnail'])
+							$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
+						$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], '-')));
+						if($s==$default || $s==$thumbnail)
+							$attach['attachment'] = substr($attach['attachment'], 0, $i);
+					}
 
 					// 删除记录
 					$axml = new maile\attachXML($attach['attachment'], DISCUZ_ROOT.'source/plugin/qiniu/attach/');
@@ -70,6 +80,8 @@ switch($_GET['action']){
 	 * 远程图片下载
 	 */
 	case 'downremoteimg':
+
+		set_time_limit(0);
 
 		$_GET['message'] = str_replace(array("\r", "\n"), array($_GET['wysiwyg'] ? '<br />' : '', "\\n"), $_GET['message']);
 		preg_match_all("/\[img\]\s*([^\[\<\r\n]+?)\s*\[\/img\]|\[img=\d{1,4}[x|\,]\d{1,4}\]\s*([^\[\<\r\n]+?)\s*\[\/img\]/is", $_GET['message'], $image1, PREG_SET_ORDER);
@@ -105,6 +117,7 @@ switch($_GET['action']){
 
 			foreach($temp as $value) {
 				$imageurl = $value[1];
+
 				$hash = md5($imageurl).'.~temp';
 				if(strlen($imageurl)) {
 					$imagereplace['oldimageurl'][] = $value[0];
@@ -131,12 +144,12 @@ switch($_GET['action']){
 						}
 
 						$attach['size'] = $res['fsize'];
-						$attach['name'] =  $res['hash'].'.'.$attach['ext'];
+						$attach['name'] =  basename($imageurl);
 						$attach['thumb'] = '';
 
 						$attach['isimage'] = $upload -> is_image_ext($attach['ext']);
 						$attach['extension'] = $upload -> get_target_extension($attach['ext']);
-						$attach['attachment'] = $attach['name'];
+						$attach['attachment'] = $res['hash'].'.'.$attach['ext'];
 						// $attach['target'] = getglobal('setting/attachdir').'./forum/'.$attach['attachment'];
 						$attach['target'] = getglobal('setting/attachdir').'./'.$attach['attachment'];
 
@@ -147,11 +160,25 @@ switch($_GET['action']){
 						$upload->attach = $attach;
 						$thumb = $width = 0;
 						if($upload->attach['isimage']){
-							if(!($inf=maile\qiniu::getImgInfo($attach['name']))){
+							if(!($inf=maile\qiniu::getImgInfo($attach['attachment']))){
 								maile\qiniu::unlink($res['key']);
 								continue;
 							}
 							$width = $inf['width'];
+							if($_G['cache']['plugin']['qiniu']['protect']){
+								if($width > 300)
+									$style = '-'.$_G['cache']['plugin']['qiniu']['default'];
+								else
+									$style = '-'.$_G['cache']['plugin']['qiniu']['thumbnail'];
+							}else{
+								if($width > 300)
+									$style = ($_G['cache']['plugin']['qiniu']['default'] ? ('-'.$_G['cache']['plugin']['qiniu']['default']) : '');
+								else
+									$style = ($_G['cache']['plugin']['qiniu']['thumbnail'] ? ('-'.$_G['cache']['plugin']['qiniu']['thumbnail']) : '');
+							}
+						}else{
+							maile\qiniu::unlink($res['key']);
+							continue;
 						}
 
 						$aids[] = $aid = getattachnewaid();
@@ -160,7 +187,7 @@ switch($_GET['action']){
 							'dateline' => $_G['timestamp'],
 							'filename' => $upload->attach['name'],
 							'filesize' => $upload->attach['size'],
-							'attachment' => $upload->attach['attachment'],
+							'attachment' => $upload->attach['attachment'].$style,
 							'isimage' => $upload->attach['isimage'],
 							'uid' => $_G['uid'],
 							'thumb' => $thumb,
@@ -195,5 +222,3 @@ EOF;
 
 }
 
-
-?>

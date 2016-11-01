@@ -168,6 +168,17 @@ if(empty($_GET['nothumb']) && $attach['isimage'] && $attach['thumb']) {
 	exit();
 }
 
+if($attach['isimage']){
+	$default = $thumbnail = '';
+	if($_G['cache']['plugin']['qiniu']['default'])
+		$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+	if($_G['cache']['plugin']['qiniu']['thumbnail'])
+		$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
+	$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], '-')));
+	if($s==$default || $s==$thumbnail)
+		$attach['attachment'] = substr($attach['attachment'], 0, $i);
+}
+
 // 引入七牛
 require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/qiniu.php';
 

@@ -7,9 +7,12 @@
 		protected $xml, $dom, $name, $element;
 
 		public function __construct($name, $path){
+			if(!isset($name{2}))
+				return;
+
 			if(!is_file($this->xml = $path.strtolower(substr($name, 0, 2)).'.xml')){
 				if(!file_put_contents($this->xml, '<?xml version="1.0" encoding="utf-8"?><attach></attach>'))
-					throw new \Exception('请检查权限', 1);
+					throw new \Exception('麦乐七牛插件: 请检查权限', 1);
 			}
 
 			$this->dom = new \DOMDocument();

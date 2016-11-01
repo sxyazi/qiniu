@@ -1,5 +1,9 @@
 <?php
 
+	if(!defined('IN_DISCUZ')) {
+		exit('Access Denied');
+	}
+
 	class plugin_qiniu{
 
 		public function post_upload_extend(){
@@ -21,6 +25,7 @@
 			if($arr['step'] != 'check')
 				return;
 			global $_G;
+			set_time_limit(0);
 			list($tids, $membercount, $credit, $ponly) = $arr['param'];
 			$count = require DISCUZ_ROOT . 'source/plugin/qiniu/extend/thread_delete.php';
 			$_G['deletethreadtids'] = array_pad(array(), $count, null);
@@ -33,10 +38,11 @@
 		// 发帖
 		public function post(){
 
+			global $_G;
+			$_G['forum']['disablewatermark'] = true;
+
 			if($_SERVER['REQUEST_METHOD']!='POST' || empty($_POST['typeoption']))
 				return;
-
-			global $_G;
 
 			$cate = C::t('forum_typeoptionvar')->fetch_all_by_tid_optionid($_G['tid']);
 			if(!$cate)
@@ -54,19 +60,36 @@
 			require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/qiniu.php';
 			require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/attachXML.php';
 			foreach($_POST['typeoption'] as $k=>$v){
-				if(isset($gory[$k]) && $gory[$k]['url']!=$v['url']){
 
-					if($v['url'] == $gory[$k]['url'].'-'.$_G['cache']['plugin']['qiniu']['thumbnail']){
+				if(empty($gory[$k]))
+					continue;
 
-						$_GET['typeoption'][$k]['url'] = substr($v['url'], 0, -strlen('-'.$_G['cache']['plugin']['qiniu']['thumbnail']));
-						$_POST['typeoption'][$k]['url'] = $_GET['typeoption'][$k]['url'];
-						$_REQUEST['typeoption'][$k]['url'] = $_GET['typeoption'][$k]['url'];
-						$_G['gp_typeoption'][$k]['url'] = $_GET['typeoption'][$k]['url'];
+				// 去除样式
+				$default = $thumbnail = '';
+				if($_G['cache']['plugin']['qiniu']['default'])
+					$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+				if($_G['cache']['plugin']['qiniu']['thumbnail'])
+					$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
 
-						continue;
-					}
+				$s = substr($v['url'], ($i=strrpos($v['url'], '-')));
+				if($s==$default || $s==$thumbnail)
+					$new = substr($v['url'], 0, $i);
+				elseif(($i=strrpos($v['url'], '?imageView2/')))
+					$new = substr($v['url'], 0, $i);
+				else
+					$new = $v['url'];
 
-					$key = basename($gory[$k]['url']);
+				$s = substr($gory[$k]['url'], ($i=strrpos($gory[$k]['url'], '-')));
+				if($s==$default || $s==$thumbnail)
+					$old = substr($gory[$k]['url'], 0, $i);
+				elseif(($i=strrpos($gory[$k]['url'], '?imageView2/')))
+					$old = substr($gory[$k]['url'], 0, $i);
+				else
+					$old = $gory[$k]['url'];
+
+				if($old != $new){
+
+					$key = basename($old);
 					$axml = new maile\attachXML($key, DISCUZ_ROOT.'source/plugin/qiniu/attach/');
 					if($axml->find()){
 						if($axml->getUses() > 1){
@@ -80,6 +103,7 @@
 					}
 
 				}
+
 			}
 
 		}
@@ -95,97 +119,11 @@
 			global $_G;
 			require DISCUZ_ROOT . 'source/plugin/qiniu/extend/forum_ajax.php';
 		}
-/*
-		// 主题管理
-		public function topicadmin(){
-			global $_G;
-			require DISCUZ_ROOT . 'source/plugin/qiniu/extend/forum_topicadmin.php';
-		}
-*/
+
 		// 附件
 		public function attachment(){
 			global $_G;
 			require DISCUZ_ROOT . 'source/plugin/qiniu/extend/forum_attachment.php';
-		}
-
-		// viewthread_bottom 挂载点
-		public function viewthread_bottom_output(){
-			global $_G;
-
-			if(!$_G['cache']['plugin']['qiniu']['protect'])
-				return;
-
-			global $threadsortshow;
-			if($threadsortshow){
-				$i = 0;
-				$imgs = C::t('forum_attachment_n')->fetch_all('pid:'.$_G['forum_firstpid'], $threadsortshow['sortaids']);
-				foreach($threadsortshow['optionlist'] as $k=>$v){
-					if($v['type'] != 'image')
-						continue;
-					$style = $imgs[$i++]['width']<300 ? $_G['cache']['plugin']['qiniu']['thumbnail'] : $_G['cache']['plugin']['qiniu']['default'];
-					$threadsortshow['optionlist'][$k]['value'] = preg_replace('/<img src="(.*?)" (.+)>/', '<img src="${1}-'.$style.'" ${2}>', $v['value']);
-				}
-			}
-
-			global $ignore, $postlist;
-			foreach($postlist as $id=>$lv){
-
-				$postlist[$id]['message'] = preg_replace_callback('/(<img id="aimg_(\d+)".*?src=".*?") zoomfile="(.*?)" file="(.*?)" (.*?\/>)/', function($m) use($id){
-
-					global $_G, $ignore, $postlist;
-
-					$style = '-' . ($postlist[$id]['attachments'][$m[2]]['width']<300 ? $_G['cache']['plugin']['qiniu']['thumbnail'] : $_G['cache']['plugin']['qiniu']['default']);
-
-					$ignore[$m[2]] = true;
-					$m[3] .= $style; $m[4] .= $style;
-
-					return $m[1] . ' zoomfile="' . $m[3] . '" file="' . $m[4] . '" ' . $m[5];
-
-				}, $lv['message']);
-
-				if(count($ignore) < count($lv['attachments'])){
-					foreach($lv['attachments'] as $k => $v){
-						if(!$ignore[$k])
-							$postlist[$id]['attachments'][$k]['attachment'] .= '-' . ($v['width']<300 ? $_G['cache']['plugin']['qiniu']['thumbnail'] : $_G['cache']['plugin']['qiniu']['default']);
-					}
-				}
-
-			}
-
-		}
-
-		// 分类信息
-		public function post_sortoption_output(){
-
-			global $_G;
-
-			if(!$_G['cache']['plugin']['qiniu']['protect'])
-				return;
-
-			$t = &$_G['forum_optionlist'];
-
-			if($t){
-				/*
-					$i = 0;
-					$aids = array_values(array_map(function($v){
-						return $v['value']['aid'];
-					}, $t));
-					$imgs = C::t('forum_attachment_n')->fetch_all('pid:'.intval($_GET['tid']), $aids);
-				*/
-
-				foreach($t as $k=>$v){
-					if(empty($v['value']))
-						continue;
-					// $style = $imgs[$i++]['width']<300 ? $_G['cache']['plugin']['qiniu']['thumbnail'] : $_G['cache']['plugin']['qiniu']['default'];
-					// $t[$k]['value']['url'] = $v['value']['url'] . '-' . $style;
-					$t[$k]['value']['url'] = $v['value']['url'] . '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
-				}
-
-			}
-
-		}
-
-		public function post_top(){
 		}
 
 	}
