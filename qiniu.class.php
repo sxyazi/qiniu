@@ -39,7 +39,7 @@
 			$_G['setting']['output']['preg']['replace'] = $_G['setting']['output']['preg']['replace'] ?: array();
 
 			$_G['setting']['rewritestatus'][] = 'qiniu';
-			$_G['setting']['output']['preg']['search'][] = '#data/attachment/forum/([a-zA-Z0-9_\.]{20,})#';
+			$_G['setting']['output']['preg']['search'][] = '#data/attachment/forum/([a-zA-Z0-9_\-\.]{20,})#';
 			$_G['setting']['output']['preg']['replace'][] = $_G['cache']['plugin']['qiniu']['url'] . '$1';
 		}
 
