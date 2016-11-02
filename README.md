@@ -14,6 +14,7 @@
 1. 点评/评分 后图片地址问题
 2. 远程图片下载 文件名使用原文件名
 3. 修复图片大小显示为0的bug
+4. 使用官方推荐的方式完成地址替换(不需要再配置重写)
 
 # 文件
 
@@ -26,31 +27,8 @@
 # 部署
 
 PHP版本要求 >= 5.4
+
 使用本插件后会替代discuz的上传服务, 所以你的网站有很多原先使用discuz的上传的附件, 不建议使用!
-
-使用本插件存入数据库的附件地址是这种形式的: data/attachment/forum/FkRsIOKizjRdSb9lqUs9ri7AbDjv.png
-所以需要使用重写来重定向到七牛的URL.
-
-Apache: 
-在 data/attachment/forum/ 目录下创建 .htaccess 文件, 内容如下: 
-```
-RewriteEngine On
-RewriteBase /
-RewriteRule ^(.*)$ http://七牛URL/$1
-```
-
-Nginx: 
-```
-rewrite data/attachment/forum/^(.*)$ http://七牛URL/$1 break;
-```
-
-IIS: 
-```
-<rule name="301Redirect" stopProcessing="true">
-    <match url="data/attachment/forum/(.*)" />
-    <action type="Redirect" url="http://七牛URL/{R:1}" redirectType="Permanent" />
-</rule>
-```
 
 # 配置
 

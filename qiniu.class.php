@@ -31,6 +31,18 @@
 			$_G['deletethreadtids'] = array_pad(array(), $count, null);
 		}
 
+		// 全局
+		public function common(){
+			global $_G;
+			$_G['setting']['rewritestatus'] = $_G['setting']['rewritestatus'] ?: array();
+			$_G['setting']['output']['preg']['search'] = $_G['setting']['output']['preg']['search'] ?: array();
+			$_G['setting']['output']['preg']['replace'] = $_G['setting']['output']['preg']['replace'] ?: array();
+
+			$_G['setting']['rewritestatus'][] = 'qiniu';
+			$_G['setting']['output']['preg']['search'][] = '#data/attachment/forum/([a-zA-Z0-9_\.]{20,})#';
+			$_G['setting']['output']['preg']['replace'][] = $_G['cache']['plugin']['qiniu']['url'] . '$1';
+		}
+
 	}
 
 	class plugin_qiniu_forum extends plugin_qiniu{
