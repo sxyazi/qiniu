@@ -16,14 +16,17 @@
 	require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/qiniu.php';
 	require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/attachXML.php';
 
-	$result = json_decode(Qiniu\base64_urlSafeDecode($_GET['upload_ret']), true);
-
-	// {"name":"test.png", "size":1418, "hash":"FkRsIOKizjRdSb9lqUs9ri7AbDjv", "type":"image/png", "key":"FkRsIOKizjRdSb9lqUs9ri7AbDjv", "ext":".png", "imageInfo":{"colorModel":"nrgba","format":"png","height":52,"width":56}}
+	// 安全检查
+	$call = $_G['siteurl'] . 'plugin.php?id=qiniu:handle&maile=' . intval($_GET['maile']);
+	$verify = maile\qiniu::$auth->verifyCallback('application/x-www-form-urlencoded', $_SERVER['HTTP_AUTHORIZATION'], $call, file_get_contents('php://input'));
+	$verify || exit();
 
 	// 获取fid
 	$url = parse_url($_SERVER['HTTP_REFERER']);
 	parse_str($url['query'], $url);
 	empty($url['fid']) && exit();
+
+	// {"name":"test.png", "size":1418, "hash":"FkRsIOKizjRdSb9lqUs9ri7AbDjv", "type":"image/png", "key":"FkRsIOKizjRdSb9lqUs9ri7AbDjv", "ext":".png", "imageInfo":{"colorModel":"nrgba","format":"png","height":52,"width":56}}
 
 	// 伪造值
 	$_GET['fid'] = $url['fid'];

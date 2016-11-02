@@ -17,5 +17,5 @@
 		'returnUrl'	=>	$_G['siteurl'] . 'plugin.php?id=qiniu:handle&maile=' . intval($_POST['maile'])
 	);
 
-	echo $auth->uploadToken($_G['cache']['plugin']['qiniu']['bucket'], null, 3600, $policy);
+	echo $auth->uploadToken($_G['cache']['plugin']['qiniu']['bucket'], null, 300, $policy);
 
