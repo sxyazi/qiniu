@@ -10,17 +10,23 @@
 8. 远程图片下载
 
 # 更新
+
 1. 点评/评分 后图片地址问题
 2. 远程图片下载 文件名使用原文件名
 3. 修复图片大小显示为0的bug
 
 # 文件
+
 存入数据库的文件名是七牛的sha1文件校验算法所生成的名字. 可以有效避免重复文件.
+
 (七牛那边的1个文件, 可以在论坛这边被N个帖子所使用)
+
 也方便以后开发秒传等功能. 使用原生JS, 不依赖flash上传, 同时旧版本的IE浏览器也不支持.
 
 # 部署
-使用本插件后会完全代替discuz的上传服务, 所以你的网站有很多原先使用discuz的上传的附件, 不要使用!!!
+
+PHP版本要求 >= 5.4
+使用本插件后会替代discuz的上传服务, 所以你的网站有很多原先使用discuz的上传的附件, 不建议使用!
 
 使用本插件存入数据库的附件地址是这种形式的: data/attachment/forum/FkRsIOKizjRdSb9lqUs9ri7AbDjv.png
 所以需要使用重写来重定向到七牛的URL.
@@ -63,7 +69,3 @@ IIS:
 
 # 数据库
 为了不改变discuz数据库结构, 使用XML做小型数据库. 所以需要你的服务器支持并启用了XML相关组件.
-
-```
-select * from (select id,name,'table0' as t from table_0 union all select id,name,'table1' as t from table_1 union all select id,name,'table2' as t from table_2 ......) as t where t.name = ?
-```

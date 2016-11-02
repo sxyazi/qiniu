@@ -3,7 +3,7 @@
 	<item id="Title"><![CDATA[Discuz! Plugin]]></item>
 	<item id="Version"><![CDATA[X3.2]]></item>
 	<item id="Time"><![CDATA[2016-11-01 22:43]]></item>
-	<item id="From"><![CDATA[Discuz! Board (http://localhost/discuz/)]]></item>
+	<item id="From"><![CDATA[麦乐学园 (http://mlg8.cc/)]]></item>
 	<item id="Data">
 		<item id="plugin">
 			<item id="available"><![CDATA[1]]></item>
@@ -39,7 +39,7 @@
 				<item id="description"><![CDATA[]]></item>
 				<item id="variable"><![CDATA[ak]]></item>
 				<item id="type"><![CDATA[text]]></item>
-				<item id="value"><![CDATA[zkbAi-qnZ7uvi2ut5kyBBKS-DpEQVe4bSy8CM1D-]]></item>
+				<item id="value"><![CDATA[你的AK]]></item>
 				<item id="extra"><![CDATA[]]></item>
 			</item>
 			<item id="1">
@@ -48,7 +48,7 @@
 				<item id="description"><![CDATA[]]></item>
 				<item id="variable"><![CDATA[sk]]></item>
 				<item id="type"><![CDATA[text]]></item>
-				<item id="value"><![CDATA[71RPL-Rrc3ICXBRy5SapzB0sWtRAetk0nXCP-yIH]]></item>
+				<item id="value"><![CDATA[你的SK]]></item>
 				<item id="extra"><![CDATA[]]></item>
 			</item>
 			<item id="2">
@@ -99,7 +99,6 @@
 		</item>
 		<item id="language">
 			<item id="scriptlang">
-				<item id="english"><![CDATA[chinese]]></item>
 			</item>
 			<item id="templatelang">
 				<item id="byte"><![CDATA[字节]]></item>
@@ -116,7 +115,6 @@
 				<item id="typeBlocked"><![CDATA[附件类型被禁止]]></item>
 			</item>
 			<item id="installlang">
-				<item id="english"><![CDATA[chinese]]></item>
 			</item>
 		</item>
 	</item>
