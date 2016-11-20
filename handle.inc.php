@@ -17,9 +17,13 @@
 	require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/attachXML.php';
 
 	// 安全检查
-	$call = $_G['siteurl'] . 'plugin.php?id=qiniu:handle&maile=' . intval($_GET['maile']);
-	$verify = maile\qiniu::$auth->verifyCallback('application/x-www-form-urlencoded', $_SERVER['HTTP_AUTHORIZATION'], $call, file_get_contents('php://input'));
-	$verify || exit();
+	if(empty($_GET['mltk']) || empty($_COOKIE['maile_upload_token']))
+		exit();
+	if(($t=time()-300) && (substr($_GET['mltk'], 0, strlen($t))<$t))
+		exit();
+	if(authcode($_COOKIE['maile_upload_token'], 'DECODE') != md5($_GET['mltk']))
+		exit();
+	dsetcookie('maile_upload_token', '', -1, -1, true);
 
 	// 获取fid
 	$url = parse_url($_SERVER['HTTP_REFERER']);
@@ -27,6 +31,7 @@
 	empty($url['fid']) && exit();
 
 	// {"name":"test.png", "size":1418, "hash":"FkRsIOKizjRdSb9lqUs9ri7AbDjv", "type":"image/png", "key":"FkRsIOKizjRdSb9lqUs9ri7AbDjv", "ext":".png", "imageInfo":{"colorModel":"nrgba","format":"png","height":52,"width":56}}
+	$result = json_decode(Qiniu\base64_urlSafeDecode($_GET['upload_ret']), true);
 
 	// 伪造值
 	$_GET['fid'] = $url['fid'];
