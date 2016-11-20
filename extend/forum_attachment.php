@@ -171,10 +171,10 @@ if(empty($_GET['nothumb']) && $attach['isimage'] && $attach['thumb']) {
 if($attach['isimage']){
 	$default = $thumbnail = '';
 	if($_G['cache']['plugin']['qiniu']['default'])
-		$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+		$default = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
 	if($_G['cache']['plugin']['qiniu']['thumbnail'])
-		$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
-	$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], '-')));
+		$thumbnail = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
+	$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], $_G['cache']['plugin']['qiniu']['separator'])));
 	if($s==$default || $s==$thumbnail)
 		$attach['attachment'] = substr($attach['attachment'], 0, $i);
 }
@@ -325,7 +325,7 @@ function getlocalfile($url, $attach){
 		$name = isset($attach['name']) ? $attach['name'] : $attach['filename'];
 		if($attach['isimage']){
 			if($attach['width'] > 300)
-				$url .= '-'.$_G['cache']['plugin']['qiniu']['default'];
+				$url .= $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
 			$url .= '?attname='.urlencode($name);
 		}else{
 			$url .= '?download/'.urlencode($name);

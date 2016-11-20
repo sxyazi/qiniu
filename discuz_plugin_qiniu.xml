@@ -2,7 +2,7 @@
 <root>
 	<item id="Title"><![CDATA[Discuz! Plugin]]></item>
 	<item id="Version"><![CDATA[X3.2]]></item>
-	<item id="Time"><![CDATA[2016-11-01 22:43]]></item>
+	<item id="Time"><![CDATA[2016-11-21 01:44]]></item>
 	<item id="From"><![CDATA[麦乐学园 (http://mlg8.cc/)]]></item>
 	<item id="Data">
 		<item id="plugin">
@@ -10,7 +10,7 @@
 			<item id="adminid"><![CDATA[1]]></item>
 			<item id="name"><![CDATA[[麦乐学园] 七牛云]]></item>
 			<item id="identifier"><![CDATA[qiniu]]></item>
-			<item id="description"><![CDATA[本插件由麦乐科技开发, http://mlg8.cc]]></item>
+			<item id="description"><![CDATA[作者: 三咲亚子, http://mlg8.cc]]></item>
 			<item id="datatables"><![CDATA[]]></item>
 			<item id="directory"><![CDATA[qiniu/]]></item>
 			<item id="copyright"><![CDATA[麦乐科技版权所有, http://mlg8.cc]]></item>
@@ -94,6 +94,15 @@
 				<item id="variable"><![CDATA[thumbnail]]></item>
 				<item id="type"><![CDATA[text]]></item>
 				<item id="value"><![CDATA[thum]]></item>
+				<item id="extra"><![CDATA[]]></item>
+			</item>
+			<item id="7">
+				<item id="displayorder"><![CDATA[7]]></item>
+				<item id="title"><![CDATA[样式分隔符]]></item>
+				<item id="description"><![CDATA[]]></item>
+				<item id="variable"><![CDATA[separator]]></item>
+				<item id="type"><![CDATA[text]]></item>
+				<item id="value"><![CDATA[-]]></item>
 				<item id="extra"><![CDATA[]]></item>
 			</item>
 		</item>

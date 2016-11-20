@@ -10,10 +10,10 @@
 			if($attach['isimage']){
 				$default = $thumbnail = '';
 				if($_G['cache']['plugin']['qiniu']['default'])
-					$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+					$default = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
 				if($_G['cache']['plugin']['qiniu']['thumbnail'])
-					$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
-				$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], '-')));
+					$thumbnail = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
+				$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], $_G['cache']['plugin']['qiniu']['separator'])));
 				if($s==$default || $s==$thumbnail)
 					$attach['attachment'] = substr($attach['attachment'], 0, $i);
 			}

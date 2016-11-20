@@ -79,11 +79,11 @@
 				// 去除样式
 				$default = $thumbnail = '';
 				if($_G['cache']['plugin']['qiniu']['default'])
-					$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+					$default = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
 				if($_G['cache']['plugin']['qiniu']['thumbnail'])
-					$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
+					$thumbnail = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
 
-				$s = substr($v['url'], ($i=strrpos($v['url'], '-')));
+				$s = substr($v['url'], ($i=strrpos($v['url'], $_G['cache']['plugin']['qiniu']['separator'])));
 				if($s==$default || $s==$thumbnail)
 					$new = substr($v['url'], 0, $i);
 				elseif(($i=strrpos($v['url'], '?imageView2/')))
@@ -91,7 +91,7 @@
 				else
 					$new = $v['url'];
 
-				$s = substr($gory[$k]['url'], ($i=strrpos($gory[$k]['url'], '-')));
+				$s = substr($gory[$k]['url'], ($i=strrpos($gory[$k]['url'], $_G['cache']['plugin']['qiniu']['separator'])));
 				if($s==$default || $s==$thumbnail)
 					$old = substr($gory[$k]['url'], 0, $i);
 				elseif(($i=strrpos($gory[$k]['url'], '?imageView2/')))

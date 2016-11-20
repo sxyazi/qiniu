@@ -54,13 +54,13 @@ if($attach = C::t('forum_attachment_n')->fetch('aid:'.$daid, $daid, array(1, -1)
 
 	$default = $thumbnail = '';
 	if($_G['cache']['plugin']['qiniu']['default'])
-		$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+		$default = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
 	if($_G['cache']['plugin']['qiniu']['thumbnail'])
-		$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
+		$thumbnail = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
 	else
 		$thumbnail = '?imageView2/' . $type . '/w/' . $w . '/h/' . $h;
 
-	$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], '-')));
+	$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], $_G['cache']['plugin']['qiniu']['separator'])));
 	if($s == $default)
 		$attach = substr($attach['attachment'], 0, $i) . $thumbnail;
 	elseif($s == '')

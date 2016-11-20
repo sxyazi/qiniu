@@ -52,14 +52,14 @@ class discuz_upload{
 				global $_G;
 				if($_G['cache']['plugin']['qiniu']['protect']){
 					if($attach['imageInfo']['width'] > 300)
-						$attach['attachment'] = $attach['maile'].'-'.$_G['cache']['plugin']['qiniu']['default'];
+						$attach['attachment'] = $attach['maile'].$_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
 					else
-						$attach['attachment'] = $attach['maile'].'-'.$_G['cache']['plugin']['qiniu']['thumbnail'];
+						$attach['attachment'] = $attach['maile'].$_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
 				}else{
 					if($attach['imageInfo']['width'] > 300)
-						$attach['attachment'] = $attach['maile'].($_G['cache']['plugin']['qiniu']['default'] ? ('-'.$_G['cache']['plugin']['qiniu']['default']) : '');
+						$attach['attachment'] = $attach['maile'].($_G['cache']['plugin']['qiniu']['default'] ? ($_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default']) : '');
 					else
-						$attach['attachment'] = $attach['maile'].($_G['cache']['plugin']['qiniu']['thumbnail'] ? ('-'.$_G['cache']['plugin']['qiniu']['thumbnail']) : '');
+						$attach['attachment'] = $attach['maile'].($_G['cache']['plugin']['qiniu']['thumbnail'] ? ($_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail']) : '');
 				}
 			}else{
 				$attach['attachment'] = $attach['maile'];

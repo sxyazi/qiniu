@@ -42,10 +42,10 @@ switch($_GET['action']){
 					if($attach['isimage']){
 						$default = $thumbnail = '';
 						if($_G['cache']['plugin']['qiniu']['default'])
-							$default = '-' . $_G['cache']['plugin']['qiniu']['default'];
+							$default = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
 						if($_G['cache']['plugin']['qiniu']['thumbnail'])
-							$thumbnail = '-' . $_G['cache']['plugin']['qiniu']['thumbnail'];
-						$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], '-')));
+							$thumbnail = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
+						$s = substr($attach['attachment'], ($i=strrpos($attach['attachment'], $_G['cache']['plugin']['qiniu']['separator'])));
 						if($s==$default || $s==$thumbnail)
 							$attach['attachment'] = substr($attach['attachment'], 0, $i);
 					}
@@ -167,14 +167,14 @@ switch($_GET['action']){
 							$width = $inf['width'];
 							if($_G['cache']['plugin']['qiniu']['protect']){
 								if($width > 300)
-									$style = '-'.$_G['cache']['plugin']['qiniu']['default'];
+									$style = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
 								else
-									$style = '-'.$_G['cache']['plugin']['qiniu']['thumbnail'];
+									$style = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
 							}else{
 								if($width > 300)
-									$style = ($_G['cache']['plugin']['qiniu']['default'] ? ('-'.$_G['cache']['plugin']['qiniu']['default']) : '');
+									$style = ($_G['cache']['plugin']['qiniu']['default'] ? ($_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default']) : '');
 								else
-									$style = ($_G['cache']['plugin']['qiniu']['thumbnail'] ? ('-'.$_G['cache']['plugin']['qiniu']['thumbnail']) : '');
+									$style = ($_G['cache']['plugin']['qiniu']['thumbnail'] ? ($_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail']) : '');
 							}
 						}else{
 							maile\qiniu::unlink($res['key']);
