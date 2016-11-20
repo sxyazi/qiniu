@@ -23,7 +23,7 @@
 		exit();
 	if(authcode($_COOKIE['maile_upload_token'], 'DECODE') != md5($_GET['mltk']))
 		exit();
-	dsetcookie('maile_upload_token', '', -1, -1, true);
+	dsetcookie('maile_upload_token', '', -1, false, true);
 
 	// 获取fid
 	$url = parse_url($_SERVER['HTTP_REFERER']);

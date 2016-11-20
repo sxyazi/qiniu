@@ -21,7 +21,7 @@
 	);
 
 	// 设置Cookie
-	dsetcookie('maile_upload_token', authcode(md5($mltk), 'ENCODE'), 300, -1, true);
+	dsetcookie('maile_upload_token', authcode(md5($mltk), 'ENCODE'), 300, false, true);
 
 	echo $auth->uploadToken($_G['cache']['plugin']['qiniu']['bucket'], null, 300, $policy);
 
