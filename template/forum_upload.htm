@@ -266,7 +266,7 @@ maile_upload.xhr = function(){
 			xmlHttp = false;
 		}
 	}
-	if(!xmlHttp && typeof XMLHttpRequest != 'undefined'){				// Firefox, Opera 8.0+, Safari
+	if(!xmlHttp && typeof XMLHttpRequest != 'undefined'){			// Firefox, Opera 8.0+, Safari
 		xmlHttp = new XMLHttpRequest();
 	}
 	return xmlHttp;
@@ -289,6 +289,8 @@ function uploadWindow(recall, type) {
 
 // 上传将开始
 function uploadWindowstart(t){
+
+	$('uploadwindowing').style.visibility = 'visible';
 
 	var xhr = maile_upload.xhr();
 	xhr.open("POST", "plugin.php?id=qiniu:token", true);
@@ -314,7 +316,10 @@ function uploadWindowload(t) {
 	if(str == '') return;
 	var arr = str.split('|');
 	if(arr[0] == 'DISCUZUPLOAD' && arr[2] == 0) {
-		UPLOADWINRECALL(arr[3], arr[5], arr[6]);
+		// arr: ["DISCUZUPLOAD", "1", "0", "9", "1", "FhE4a1YhJJRwQaeqn8X6FqjMyCyC.jpg!m", "1.jpg", "0"]
+		var identifier = UPLOADWINRECALL.toString().split("sortaid_")[1].split("_upload")[0];
+		$("sortaid_" + identifier + "_url").value = arr[5];
+		updatesortattach(arr[3], arr[5], "{$_G[cache][plugin][qiniu][url]}", identifier);
 		hideWindow('upload', 0);
 	} else {
 		var sizelimit = '';
