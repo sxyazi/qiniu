@@ -77,19 +77,18 @@
 				$gory[$option[$v['optionid']]['identifier']] = dunserialize($v['value']);
 			}
 
+			$default = $thumbnail = '';
+			if($_G['cache']['plugin']['qiniu']['default'])
+				$default = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
+			if($_G['cache']['plugin']['qiniu']['thumbnail'])
+				$thumbnail = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
+
 			require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/qiniu.php';
 			require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/attachXML.php';
 			foreach($_POST['typeoption'] as $k=>$v){
 
-				if(empty($gory[$k]))
+				if(!array_key_exists($k, $gory))
 					continue;
-
-				// 去除样式
-				$default = $thumbnail = '';
-				if($_G['cache']['plugin']['qiniu']['default'])
-					$default = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['default'];
-				if($_G['cache']['plugin']['qiniu']['thumbnail'])
-					$thumbnail = $_G['cache']['plugin']['qiniu']['separator'].$_G['cache']['plugin']['qiniu']['thumbnail'];
 
 				$s = substr($v['url'], ($i=strrpos($v['url'], $_G['cache']['plugin']['qiniu']['separator'])));
 				if($s==$default || $s==$thumbnail)
@@ -107,19 +106,18 @@
 				else
 					$old = $gory[$k]['url'];
 
-				if($old != $new){
+				if(($old=basename($old)) != basename($new)){
 
-					$key = basename($old);
-					$axml = new maile\attachXML($key, DISCUZ_ROOT.'source/plugin/qiniu/attach/');
+					$axml = new maile\attachXML($old, DISCUZ_ROOT.'source/plugin/qiniu/attach/');
 					if($axml->find()){
 						if($axml->getUses() > 1){
 							$axml->delUses();
 						}else{
 							$axml->del();
-							maile\qiniu::unlink($key);
+							maile\qiniu::unlink($old);
 						}
 					}else{
-						maile\qiniu::unlink($key);
+						maile\qiniu::unlink($old);
 					}
 
 				}

@@ -319,7 +319,7 @@ function uploadWindowload(t) {
 		// arr: ["DISCUZUPLOAD", "1", "0", "9", "1", "FhE4a1YhJJRwQaeqn8X6FqjMyCyC.jpg!m", "1.jpg", "0"]
 		var identifier = UPLOADWINRECALL.toString().split("sortaid_")[1].split("_upload")[0];
 		$("sortaid_" + identifier + "_url").value = arr[5];
-		updatesortattach(arr[3], arr[5], "{$_G[cache][plugin][qiniu][url]}", identifier);
+		updatesortattach(arr[3], arr[5], "{$_G[cache][plugin][qiniu][url]}".replace(/(\/$)/g,""), identifier);
 		hideWindow('upload', 0);
 	} else {
 		var sizelimit = '';
