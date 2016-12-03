@@ -26,15 +26,18 @@
 	dsetcookie('maile_upload_token', '', -1, false, true);
 
 	// 获取fid
-	$url = parse_url($_SERVER['HTTP_REFERER']);
-	parse_str($url['query'], $url);
-	empty($url['fid']) && exit();
+	if($_GET['maile'] < 3){
+		$url = parse_url($_SERVER['HTTP_REFERER']);
+		parse_str($url['query'], $url);
+		empty($url['fid']) && exit();
+		$_GET['fid'] = $url['fid'];
+	}else{
+		empty($_GET['fid']) && exit();
+		$_GET['fid'] = $_GET['fid'];
+	}
 
 	// {"name":"test.png", "size":1418, "hash":"FkRsIOKizjRdSb9lqUs9ri7AbDjv", "type":"image/png", "key":"FkRsIOKizjRdSb9lqUs9ri7AbDjv", "ext":".png", "imageInfo":{"colorModel":"nrgba","format":"png","height":52,"width":56}}
 	$result = json_decode(Qiniu\base64_urlSafeDecode($_GET['upload_ret']), true);
-
-	// 伪造值
-	$_GET['fid'] = $url['fid'];
 	$_FILES['Filedata'] = array(
 		'name'		=>	$result['name'],
 		'type'		=>	$result['ext'],
@@ -46,7 +49,7 @@
 	);
 	$_GET['type'] = 'image';
 	$_GET['operation'] = 'upload';
-	if($_GET['maile'] == 1){
+	if($_GET['maile']==1 || $_GET['maile']==3){
 		unset($_GET['type']);
 	}elseif($_GET['maile'] == 2){
 		$_GET['simple'] = 2;
@@ -61,8 +64,7 @@
 		$str = explode('|', $id);
 		if(!is_numeric($str[3]) || $str[3]<1)
 			maile\qiniu::unlink($result['key']);
-		echo $id;
-		return;
+		echo $id; return;
 	}
 
 	if(!is_numeric($id) || $id<1)

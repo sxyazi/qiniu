@@ -105,6 +105,7 @@ switch($_GET['action']){
 		}
 
 		// 引入类库
+		require_once DISCUZ_ROOT.'source/plugin/qiniu/lib/attachXML.php';
 		require_once DISCUZ_ROOT.'source/plugin/qiniu/extend/discuz_upload.php';
 		// print_r($temp);die;
 		// require_once libfile('class/image');
@@ -136,7 +137,7 @@ switch($_GET['action']){
 						if($res = maile\qiniu::fetch($imageurl, $hash)){
 							if(!maile\qiniu::rename($res['key'], $res['hash'].'.'.$attach['ext'])){
 								maile\qiniu::unlink($res['key']);
-								if(!maile\qiniu::getInfo($res['key']))
+								if(!maile\qiniu::getInfo($res['hash'].'.'.$attach['ext']))
 									continue;
 							}
 						}else{
@@ -144,7 +145,7 @@ switch($_GET['action']){
 						}
 
 						$attach['size'] = $res['fsize'];
-						$attach['name'] =  basename($imageurl);
+						$attach['name'] = basename($imageurl);
 						$attach['thumb'] = '';
 
 						$attach['isimage'] = $upload -> is_image_ext($attach['ext']);
@@ -179,6 +180,17 @@ switch($_GET['action']){
 						}else{
 							maile\qiniu::unlink($res['key']);
 							continue;
+						}
+
+						// 添加记录
+						$axml = new maile\attachXML($upload->attach['attachment'], DISCUZ_ROOT.'source/plugin/qiniu/attach/');
+						if($axml->find()){
+							if($axml->getUses() < 1)
+								$axml->setUses(1);
+							else
+								$axml->addUses();
+						}else{
+							$axml->add($upload->attach['attachment']);
 						}
 
 						$aids[] = $aid = getattachnewaid();

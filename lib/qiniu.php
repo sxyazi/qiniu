@@ -4,7 +4,6 @@
 
 	global $_G;
 	require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/php/Autoload.php';
-	require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/php/Http/Error.php';
 	require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/php/Storage/BucketManager.php';
 
 	qiniu::$config = $_G['cache']['plugin']['qiniu'];

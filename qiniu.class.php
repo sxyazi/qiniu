@@ -20,6 +20,21 @@
 			return $content;
 		}
 
+		// 贴内回复
+		public function viewthread_fastpost_btn_extra(){
+			global $_G;
+
+			// 获取配置
+			require_once libfile('function/upload');
+			$swfconfig = getuploadconfig($_G['uid'], $_G['fid']);
+			$imgexts = str_replace(array(';', '*.'), array(', ', ''), $swfconfig['imageexts']['ext']);
+			$allowpostimg = $_G['group']['allowpostimage'] && $imgexts;
+
+			// 加载模板
+			include template('qiniu:fastpost_upload');
+			return $content;
+		}
+
 		// 删除主题
 		public function deletethread($arr){
 			if($arr['step'] != 'check')
@@ -87,7 +102,7 @@
 			require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/attachXML.php';
 			foreach($_POST['typeoption'] as $k=>$v){
 
-				if(!array_key_exists($k, $gory))
+				if(!is_array($v) || empty($v['url']) || !array_key_exists($k, $gory) || empty($gory[$k]['url']))
 					continue;
 
 				$s = substr($v['url'], ($i=strrpos($v['url'], $_G['cache']['plugin']['qiniu']['separator'])));

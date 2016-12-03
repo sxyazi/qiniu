@@ -1,0 +1,44 @@
+<!--{block content}-->
+<script type="text/javascript" src="source/plugin/qiniu/template/maile_upload.js"></script>
+<script>
+
+var maile_upload_config = {
+	"max": "$swfconfig[max]",
+	"hash": "$swfconfig[hash]",
+	"imageext": "$swfconfig[imageexts][ext];",
+	"attachext": "$swfconfig[attachexts][ext];",
+	"lang": {
+		"byte": "{lang qiniu:byte}",
+		"uploadImg": "{lang qiniu:uploadImg}",
+		"notExceed": "{lang qiniu:notExceed}",
+		"onlyAllow": "{lang qiniu:onlyAllow}",
+		"typeFile": "{lang qiniu:typeFile}",
+		"uploadError": "{lang qiniu:uploadError}",
+		"checkNetwork": "{lang qiniu:checkNetwork}"
+	}
+};
+
+(function(){
+
+	var a = document.createElement("a");
+	a.id = "SWFUpload_0";
+	a.href = "javascript:;"
+	a.style.margin = "0px";
+	a.style.background = "url(" + upload.settings.button_image_url + ") no-repeat";
+
+	var e = document.getElementById("SWFUpload_0");
+	e.parentNode.replaceChild(a, e);
+
+	var up = new maile_upload(2);
+	up.init(document.getElementById("f_pst"));
+	console.log(up);
+
+	var a = document.getElementById("SWFUpload_0");
+	a.onclick = function(){
+		up.file.click();
+	}
+
+})();
+
+</script>
+<!--{/block}-->

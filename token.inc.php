@@ -17,7 +17,7 @@
 
 	$policy = array(
 		'returnBody'	=>	'{"name":$(fname), "size":$(fsize), "hash":$(etag), "type":$(mimeType), "key":$(key), "ext":$(ext), "imageInfo":$(imageInfo)}',
-		'returnUrl'	=>	$_G['siteurl'] . 'plugin.php?id=qiniu:handle&mltk=' . $mltk . '&maile=' . intval($_POST['maile'])
+		'returnUrl'	=>	$_G['siteurl'] . 'plugin.php?id=qiniu:handle&mltk=' . $mltk . '&maile=' . intval($_POST['maile']) . (empty($_POST['fid'])?'':'&fid='.intval($_POST['fid']))
 	);
 
 	// 设置Cookie
