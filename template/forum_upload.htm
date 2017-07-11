@@ -131,6 +131,14 @@ function uploadWindowload(t) {
 	}
 }
 
+// 更新表单元素
+function updatesortattach(aid, url, attachurl, identifier) {
+	$('sortaid_' + identifier).value = aid;
+	$('sortattachurl_' + identifier).value = 'data/attachment/sort/' + url;
+	$('sortattach_image_' + identifier).innerHTML = '<img src="' + attachurl + '/' + url + '" class="spimg" />';
+	ATTACHORIMAGE = 1;
+}
+
 </script>
 
 <!--{/block}-->

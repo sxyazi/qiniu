@@ -53,7 +53,7 @@
 			if($_G['setting']['rewriteguest'] && $_G['uid']){
 				$_G['setting']['rewriteguest'] = false;
 				$_G['setting']['rewritestatus'] = array('qiniu');
-				$_G['setting']['output']['preg']['search'] = array('qiniu'=>'#data/attachment/forum/([a-zA-Z0-9_\-\.]{20,})#');
+				$_G['setting']['output']['preg']['search'] = array('qiniu'=>'#data/attachment/(?:forum|sort)/([a-zA-Z0-9_!\-\.]{20,})#');
 				$_G['setting']['output']['preg']['replace'] = array('qiniu'=>$_G['cache']['plugin']['qiniu']['url'] . '\\1');
 			}else{
 				$_G['setting']['rewritestatus'] = $_G['setting']['rewritestatus'] ?: array();
@@ -61,7 +61,7 @@
 				$_G['setting']['output']['preg']['replace'] = $_G['setting']['output']['preg']['replace'] ?: array();
 
 				$_G['setting']['rewritestatus'][] = 'qiniu';
-				$_G['setting']['output']['preg']['search']['qiniu'] = '#data/attachment/forum/([a-zA-Z0-9_\-\.]{20,})#';
+				$_G['setting']['output']['preg']['search']['qiniu'] = '#data/attachment/(?:forum|sort)/([a-zA-Z0-9_!\-\.]{20,})#';
 				$_G['setting']['output']['preg']['replace']['qiniu'] = $_G['cache']['plugin']['qiniu']['url'] . '\\1';
 			}
 		}
@@ -79,6 +79,7 @@
 			if($_SERVER['REQUEST_METHOD']!='POST' || empty($_POST['typeoption']))
 				return;
 
+			// 编辑帖子
 			$cate = C::t('forum_typeoptionvar')->fetch_all_by_tid_optionid($_G['tid']);
 			if(!$cate)
 				return;
@@ -105,6 +106,7 @@
 				if(!is_array($v) || empty($v['url']) || !array_key_exists($k, $gory) || empty($gory[$k]['url']))
 					continue;
 
+				// 去新图片样式分隔符
 				$s = substr($v['url'], ($i=strrpos($v['url'], $_G['cache']['plugin']['qiniu']['separator'])));
 				if($s==$default || $s==$thumbnail)
 					$new = substr($v['url'], 0, $i);
@@ -113,6 +115,7 @@
 				else
 					$new = $v['url'];
 
+				// 去旧图片样式分隔符
 				$s = substr($gory[$k]['url'], ($i=strrpos($gory[$k]['url'], $_G['cache']['plugin']['qiniu']['separator'])));
 				if($s==$default || $s==$thumbnail)
 					$old = substr($gory[$k]['url'], 0, $i);
