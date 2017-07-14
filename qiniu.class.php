@@ -50,11 +50,18 @@
 		public function common(){
 			global $_G;
 
+			// 兼容Discuz 3.2+ 版本
+			if($_G['setting']['version']{3} < 3){
+				$replace = $_G['cache']['plugin']['qiniu']['url'] . '\\1';
+			}else{
+				$replace = "'{$_G['cache']['plugin']['qiniu']['url']}' . \$matches[1]";
+			}
+
 			if($_G['setting']['rewriteguest'] && $_G['uid']){
 				$_G['setting']['rewriteguest'] = false;
 				$_G['setting']['rewritestatus'] = array('qiniu');
 				$_G['setting']['output']['preg']['search'] = array('qiniu'=>'#data/attachment/(?:forum|sort)/([a-zA-Z0-9_!\-\.]{20,})#');
-				$_G['setting']['output']['preg']['replace'] = array('qiniu'=>$_G['cache']['plugin']['qiniu']['url'] . '\\1');
+				$_G['setting']['output']['preg']['replace'] = array('qiniu'=>$replace);
 			}else{
 				$_G['setting']['rewritestatus'] = $_G['setting']['rewritestatus'] ?: array();
 				$_G['setting']['output']['preg']['search'] = $_G['setting']['output']['preg']['search'] ?: array();
@@ -62,7 +69,7 @@
 
 				$_G['setting']['rewritestatus'][] = 'qiniu';
 				$_G['setting']['output']['preg']['search']['qiniu'] = '#data/attachment/(?:forum|sort)/([a-zA-Z0-9_!\-\.]{20,})#';
-				$_G['setting']['output']['preg']['replace']['qiniu'] = $_G['cache']['plugin']['qiniu']['url'] . '\\1';
+				$_G['setting']['output']['preg']['replace']['qiniu'] = $replace;
 			}
 		}
 
