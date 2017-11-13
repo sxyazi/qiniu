@@ -7,7 +7,9 @@
  *      $Id: forum_ajax.php 34303 2014-01-15 04:32:19Z hypowang $
  */
 
-if(!in_array($_GET['action'], array('deleteattach', 'downremoteimg'))){
+// error_reporting(E_ALL);
+
+if(!in_array($_GET['action'], array('deleteattach', 'downremoteimg', 'setthreadcover'))){
 	require DISCUZ_ROOT . 'source/module/forum/forum_ajax.php';
 }
 
@@ -20,6 +22,81 @@ define('NOROBOT', TRUE);
 // 引入类库
 require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/qiniu.php';
 require_once DISCUZ_ROOT . 'source/plugin/qiniu/lib/attachXML.php';
+
+function maile_setthreadcover($pid, $tid = 0, $aid = 0, $countimg = 0, $imgurl = '') {
+	global $_G;
+	$cover = 0;
+	if(empty($_G['uid']) || !intval($_G['setting']['forumpicstyle']['thumbheight']) || !intval($_G['setting']['forumpicstyle']['thumbwidth'])) {
+		return false;
+	}
+
+	if(($pid || $aid) && empty($countimg)) {
+		if(empty($imgurl)) {
+			if($aid) {
+				$attachtable = 'aid:'.$aid;
+				$attach = C::t('forum_attachment_n')->fetch('aid:'.$aid, $aid, array(1, -1));
+			} else {
+				$attachtable = 'pid:'.$pid;
+				$attach = C::t('forum_attachment_n')->fetch_max_image('pid:'.$pid, 'pid', $pid);
+			}
+			if(!$attach) {
+				return false;
+			}
+			if(empty($_G['forum']['ismoderator']) && $_G['uid'] != $attach['uid']) {
+				return false;
+			}
+			$pid = empty($pid) ? $attach['pid'] : $pid;
+			$tid = empty($tid) ? $attach['tid'] : $tid;
+			$picsource = ($attach['remote'] ? $_G['setting']['ftp']['attachurl'] : $_G['setting']['attachurl']).'forum/'.$attach['attachment'];
+		} else {
+			$attachtable = 'pid:'.$pid;
+			$picsource = $imgurl;
+		}
+
+		$temp_file = tempnam(sys_get_temp_dir(), 'thumb');
+		set_time_limit(0);
+		file_put_contents($temp_file, file_get_contents($_G['cache']['plugin']['qiniu']['url'] . basename($picsource)));
+
+		$basedir = !$_G['setting']['attachdir'] ? (DISCUZ_ROOT.'./data/attachment/') : $_G['setting']['attachdir'];
+		$coverdir = 'threadcover/'.substr(md5($tid), 0, 2).'/'.substr(md5($tid), 2, 2).'/';
+		dmkdir($basedir.'./forum/'.$coverdir);
+
+		require_once libfile('class/image');
+		$image = new image();
+		if($image->Thumb($temp_file, 'forum/'.$coverdir.$tid.'.jpg', $_G['setting']['forumpicstyle']['thumbwidth'], $_G['setting']['forumpicstyle']['thumbheight'], 2)) {
+			unlink($temp_file);
+			$remote = '';
+			if(getglobal('setting/ftp/on')) {
+				if(ftpcmd('upload', 'forum/'.$coverdir.$tid.'.jpg')) {
+					$remote = '-';
+				}
+			}
+			$cover = C::t('forum_attachment_n')->count_image_by_id($attachtable, 'pid', $pid);
+			if($imgurl && empty($cover)) {
+				$cover = 1;
+			}
+			$cover = $remote.$cover;
+		} else {
+			unlink($temp_file);
+			return false;
+		}
+	}
+	if($countimg) {
+		if(empty($cover)) {
+			$thread = C::t('forum_thread')->fetch($tid);
+			$oldcover = $thread['cover'];
+
+			$cover = C::t('forum_attachment_n')->count_image_by_id('tid:'.$tid, 'pid', $pid);
+			if($cover) {
+				$cover = $oldcover < 0 ? '-'.$cover : $cover;
+			}
+		}
+	}
+	if($cover) {
+		C::t('forum_thread')->update($tid, array('cover' => $cover));
+		return true;
+	}
+}
 
 switch($_GET['action']){
 
@@ -231,6 +308,60 @@ EOF;
 	break;
 
 
+	/**
+	 * 设置封面
+	 */
+	case 'setthreadcover':
+
+		$aid = intval($_GET['aid']);
+		$imgurl = $_GET['imgurl'];
+		require_once libfile('function/post');
+		if($_G['forum'] && ($aid || $imgurl)) {
+			if($imgurl) {
+				$tid = intval($_GET['tid']);
+				$pid = intval($_GET['pid']);
+			} else {
+				$threadimage = C::t('forum_attachment_n')->fetch('aid:'.$aid, $aid);
+				$tid = $threadimage['tid'];
+				$pid = $threadimage['pid'];
+			}
+
+			if($tid && $pid) {
+				$thread =get_thread_by_tid($tid);
+			} else {
+				$thread = array();
+			}
+
+			if(empty($thread) || (!$_G['forum']['ismoderator'] && $_G['uid'] != $thread['authorid'])) {
+				if($_GET['newthread']) {
+					showmessage('set_cover_faild', '', array(), array('msgtype' => 3));
+				} else {
+					showmessage('set_cover_faild', '', array(), array('closetime' => 3));
+				}
+			}
+			if(maile_setthreadcover($pid, $tid, $aid, 0, $imgurl)) {
+				if(empty($imgurl)) {
+					C::t('forum_threadimage')->delete_by_tid($threadimage['tid']);
+					C::t('forum_threadimage')->insert(array(
+						'tid' => $threadimage['tid'],
+						'attachment' => $threadimage['attachment'],
+						'remote' => $threadimage['remote'],
+					));
+				}
+				if($_GET['newthread']) {
+					showmessage('set_cover_succeed', '', array(), array('msgtype' => 3));
+				} else {
+					showmessage('set_cover_succeed', '', array(), array('alert' => 'right', 'closetime' => 1));
+				}
+			}
+		}
+		if($_GET['newthread']) {
+			showmessage('set_cover_faild', '', array(), array('msgtype' => 3));
+		} else {
+			showmessage('set_cover_faild', '', array(), array('closetime' => 3));
+		}
+
+	break;
+
 
 }
-
